@@ -9,7 +9,7 @@ const chatRepository = new ChatRepository();
 const chatService = new ChatService(chatRepository);
 const chatController = new ChatController(chatService);
 
-chatRoutes.post('/chats', chatController.createChat);
-chatRoutes.get('/chats/:id', chatController.getChatsByUserId);
+chatRoutes.post('/chats', (req, res) => chatController.createChat(req, res));
+chatRoutes.get('/chats', (req, res) => chatController.getChatsByUserId(req, res));
 
 export { chatRoutes };

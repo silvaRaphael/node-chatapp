@@ -1,19 +1,23 @@
 import { uuid } from 'uuidv4';
 
 export interface IUser {
-	id?: String;
-	name: String;
-	email: String;
-	password: String;
-	token?: String;
+	id?: string;
+	name: string;
+	email: string;
+	password: string;
+	token?: string;
+	createdAt?: string;
+	updatedAt?: string;
 }
 
 export class User {
-	public id: String;
-	public name: String;
-	public email: String;
-	public password: String;
-	public token: String;
+	public id: string;
+	public name: string;
+	public email: string;
+	public password: string;
+	public token: string;
+	public createdAt: Date;
+	public updatedAt: Date;
 
 	constructor({ id, name, email, password }: IUser) {
 		this.id = id || 'meu-id' /* uuid() */;
@@ -21,5 +25,7 @@ export class User {
 		this.email = email;
 		this.password = password;
 		this.token = 'meu-token' /* uuid() */;
+		this.createdAt = new Date();
+		this.updatedAt = new Date();
 	}
 }

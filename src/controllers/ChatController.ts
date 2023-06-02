@@ -9,10 +9,12 @@ export class ChatController {
 	}
 
 	async createChat(request: Request, response: Response): Promise<Response> {
+		const { userId } = request as any;
 		const { users } = request.body;
 
 		try {
 			const chat = await this.chatService.createChat({
+				userId,
 				users,
 			});
 
@@ -24,11 +26,15 @@ export class ChatController {
 		}
 	}
 
-	async getChatsById(request: Request, response: Response): Promise<Response> {
+	async getChatById(request: Request, response: Response): Promise<Response> {
+		const { userId } = request as any;
 		const { id } = request.params;
 
 		try {
-			const chat = await this.chatService.getChatsById(id);
+			const chat = await this.chatService.getChatById({
+				chat: id,
+				user: userId,
+			});
 
 			return response.json(chat);
 		} catch (error: any) {
@@ -38,14 +44,11 @@ export class ChatController {
 		}
 	}
 
-	async getChatsByUserId(
-		request: Request,
-		response: Response,
-	): Promise<Response> {
-		const { id } = request.params;
+	async getChatsByUserId(request: Request, response: Response): Promise<Response> {
+		const { userId } = request as any;
 
 		try {
-			const chats = await this.chatService.getChatsByUserId(id);
+			const chats = await this.chatService.getChatsByUserId(userId);
 
 			return response.json(chats);
 		} catch (error: any) {

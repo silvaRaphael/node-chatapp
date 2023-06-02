@@ -1,37 +1,37 @@
 import { User } from '../entities/User';
 import { UserRepository } from '../repositories/UserRepository';
+import { Transporter } from 'nodemailer';
+import { newUserMailTemplate } from '../utils/mailTemplates';
 
 interface CreateUserRequest {
-	name: String;
-	email: String;
-	password: String;
+	name: string;
+	email: string;
+	password: string;
 }
 
 interface UpdateUserRequest {
-	id: String;
-	name: String;
-	email: String;
-	password: String;
+	id: string;
+	name: string;
+	email: string;
+	password: string;
 }
 
 export class UserService {
 	private userRepository: UserRepository;
+	private transporter: Transporter | null;
 
-	constructor(userRepository: UserRepository) {
+	constructor(userRepository: UserRepository, transporter: Transporter | null) {
 		this.userRepository = userRepository;
+		this.transporter = transporter;
 	}
 
-	async authenticateUser(token: String): Promise<User | null> {
+	async authenticateUser(token: string): Promise<User | null> {
 		const user = await this.userRepository.authenticate(token);
 
 		return user;
 	}
 
-	async createUser({
-		name,
-		email,
-		password,
-	}: CreateUserRequest): Promise<User> {
+	async createUser({ name, email, password }: CreateUserRequest): Promise<User> {
 		if (!name || !email || !password) throw new Error('Missing data!');
 
 		const user = new User({
@@ -42,21 +42,23 @@ export class UserService {
 
 		const createdUser = await this.userRepository.create(user);
 
+		this.transporter!.sendMail({
+			from: 'miles.barrows@ethereal.email',
+			to: user.email,
+			subject: 'User created! 🎉',
+			html: newUserMailTemplate(user),
+		});
+
 		return createdUser;
 	}
 
-	async getUser(id: String): Promise<User | null> {
+	async getUser(id: string): Promise<User | null> {
 		const user = await this.userRepository.findById(id);
 
 		return user;
 	}
 
-	async updateUser({
-		id,
-		name,
-		email,
-		password,
-	}: UpdateUserRequest): Promise<User> {
+	async updateUser({ id, name, email, password }: UpdateUserRequest): Promise<User> {
 		if (!id) throw new Error('ID was not informed!');
 
 		if (!name || !email || !password) throw new Error('Missing data!');

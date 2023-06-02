@@ -1,8 +1,9 @@
 import { Chat } from '../entities/Chat';
-import { ChatRepository } from '../repositories/ChatRepository';
+import { ChatRepository, FindByChatAndUser } from '../repositories/ChatRepository';
 
 interface CreateChatRequest {
-	users: String[];
+	userId: string;
+	users: string[];
 }
 
 export class ChatService {
@@ -12,8 +13,10 @@ export class ChatService {
 		this.chatRepository = chatRepository;
 	}
 
-	async createChat({ users }: CreateChatRequest): Promise<Chat> {
+	async createChat({ userId, users }: CreateChatRequest): Promise<Chat> {
 		if (!users || users.length != 2) throw new Error('Missing data!');
+
+		if (!users.includes(userId)) throw new Error('Unauthorized!');
 
 		const chat = new Chat({ users });
 
@@ -22,25 +25,31 @@ export class ChatService {
 		return chatCreated;
 	}
 
-	async getChatsById(id: String): Promise<Chat | null> {
-		const chat = await this.chatRepository.findById(id);
+	async getChatById({ chat, user }: FindByChatAndUser): Promise<Chat | null> {
+		const chatMatch = await this.chatRepository.findByChatIdAndUserId({
+			chat,
+			user,
+		});
 
-		if (!chat) return null;
+		if (!chatMatch) return null;
 
-		return chat;
+		return chatMatch;
 	}
 
-	async getChatsByUserId(id: String): Promise<Chat[]> {
+	async getChatsByUserId(id: string): Promise<Chat[]> {
 		const chats = await this.chatRepository.findByUserId(id);
 
 		return chats;
 	}
 
-	async updateChat(id: String): Promise<Chat> {
-		if (!id) throw new Error('ID was not informed!');
+	async updateChat({ chat, user }: FindByChatAndUser): Promise<Chat> {
+		if (!chat) throw new Error('ID was not informed!');
 
 		try {
-			const existingChat = await this.chatRepository.findById(id);
+			const existingChat = await this.chatRepository.findByChatIdAndUserId({
+				chat,
+				user,
+			});
 
 			if (!existingChat) throw new Error('Chat does not exist!');
 

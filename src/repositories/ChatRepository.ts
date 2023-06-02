@@ -1,9 +1,14 @@
 import { Chat } from '../entities/Chat';
 
+export interface FindByChatAndUser {
+	chat: string;
+	user: string;
+}
+
 export interface IChatRepository {
 	create(chat: Chat): Promise<Chat>;
-	findById(id: String): Promise<Chat | null>;
-	findByUserId(id: String): Promise<Chat[]>;
+	findByChatIdAndUserId({ chat, user }: FindByChatAndUser): Promise<Chat | null>;
+	findByUserId(id: string): Promise<Chat[]>;
 	save(chat: Chat): Promise<Chat>;
 }
 
@@ -12,9 +17,7 @@ export class ChatRepository implements IChatRepository {
 
 	async create(chat: Chat): Promise<Chat> {
 		const chatExists = this.chats.find(
-			(item) =>
-				item.users.includes(chat.users[0]) &&
-				item.users.includes(chat.users[1]),
+			(item) => item.users.includes(chat.users[0]) && item.users.includes(chat.users[1]),
 		);
 
 		if (chatExists) throw new Error('Chat already exists!');
@@ -24,15 +27,15 @@ export class ChatRepository implements IChatRepository {
 		return chat;
 	}
 
-	async findById(id: String): Promise<Chat | null> {
-		const chat = this.chats.find((item) => item.id === id);
+	async findByChatIdAndUserId({ chat, user }: FindByChatAndUser): Promise<Chat | null> {
+		const chatMatch = this.chats.find((item) => item.id === chat && item.users.includes(user));
 
-		if (!chat) return null;
+		if (!chatMatch) return null;
 
-		return chat;
+		return chatMatch;
 	}
 
-	async findByUserId(id: String): Promise<Chat[]> {
+	async findByUserId(id: string): Promise<Chat[]> {
 		const chats = this.chats.filter((item) => item.users.includes(id));
 
 		return chats;

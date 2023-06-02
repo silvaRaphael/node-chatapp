@@ -1,6 +1,7 @@
 import { User } from '../entities/User';
+import { transporter } from '../providers/mailProvider';
 import { UserRepository } from '../repositories/UserRepository';
-import { UserService } from './UserService';
+import { UserService } from '../services/UserService';
 
 describe('UserService', () => {
 	let userRepository: UserRepository;
@@ -8,7 +9,7 @@ describe('UserService', () => {
 
 	beforeAll(() => {
 		userRepository = new UserRepository();
-		userService = new UserService(userRepository);
+		userService = new UserService(userRepository, transporter);
 	});
 
 	it('should be able to create an user', async () => {

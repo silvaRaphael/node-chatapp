@@ -1,16 +1,16 @@
 import { User } from '../entities/User';
 
 export interface UserRepository {
-	authenticate(token: String): Promise<User | null>;
+	authenticate(token: string): Promise<User | null>;
 	create(user: User): Promise<User>;
-	findById(id: String): Promise<User | null>;
+	findById(id: string): Promise<User | null>;
 	save(user: User): Promise<User>;
 }
 
 export class UserRepository implements UserRepository {
 	users: User[] = [];
 
-	async authenticate(token: String): Promise<User | null> {
+	async authenticate(token: string): Promise<User | null> {
 		const user = this.users.find((item) => item.token === token);
 
 		if (!user) return null;
@@ -28,7 +28,7 @@ export class UserRepository implements UserRepository {
 		return user;
 	}
 
-	async findById(id: String): Promise<User | null> {
+	async findById(id: string): Promise<User | null> {
 		const user = this.users.find((item) => item.id === id);
 
 		if (!user) return null;
@@ -44,6 +44,7 @@ export class UserRepository implements UserRepository {
 		userMatch.name = user.name;
 		userMatch.email = user.email;
 		userMatch.password = user.password;
+		userMatch.updatedAt = new Date();
 
 		return userMatch;
 	}

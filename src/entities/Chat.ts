@@ -1,15 +1,15 @@
 import { uuid } from 'uuidv4';
 
 export interface IChat {
-	id?: String;
-	users: String[];
+	id?: string;
+	users: string[];
 	createdAt?: Date;
 	updatedAt?: Date;
 }
 
 export class Chat implements IChat {
-	public id: String;
-	public users: String[];
+	public id: string;
+	public users: string[];
 	public createdAt: Date;
 	public updatedAt: Date;
 
