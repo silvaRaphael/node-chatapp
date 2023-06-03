@@ -1,4 +1,4 @@
-export const newUserMailTemplate = ({ name, email }: { name: string; email: string }) => {
+export const newUserEmailTemplate = ({ name, email }: { name: string; email: string }) => {
 	let html = `
     <!DOCTYPE html>
     <html lang="en">

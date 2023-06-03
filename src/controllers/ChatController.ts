@@ -9,10 +9,10 @@ export class ChatController {
 	}
 
 	async createChat(request: Request, response: Response): Promise<Response> {
-		const { userId } = request as any;
-		const { users } = request.body;
-
 		try {
+			const { userId } = request as any;
+			const { users } = request.body;
+
 			const chat = await this.chatService.createChat({
 				userId,
 				users,
@@ -27,10 +27,10 @@ export class ChatController {
 	}
 
 	async getChatById(request: Request, response: Response): Promise<Response> {
-		const { userId } = request as any;
-		const { id } = request.params;
-
 		try {
+			const { userId } = request as any;
+			const { id } = request.params;
+
 			const chat = await this.chatService.getChatById({
 				chat: id,
 				user: userId,
@@ -45,9 +45,9 @@ export class ChatController {
 	}
 
 	async getChatsByUserId(request: Request, response: Response): Promise<Response> {
-		const { userId } = request as any;
-
 		try {
+			const { userId } = request as any;
+
 			const chats = await this.chatService.getChatsByUserId(userId);
 
 			return response.json(chats);

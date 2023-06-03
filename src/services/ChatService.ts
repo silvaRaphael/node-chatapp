@@ -20,12 +20,18 @@ export class ChatService {
 
 		const chat = new Chat({ users });
 
-		const chatCreated = await this.chatRepository.create(chat);
+		try {
+			const chatCreated = await this.chatRepository.create(chat);
 
-		return chatCreated;
+			return chatCreated;
+		} catch (error: any) {
+			throw error;
+		}
 	}
 
 	async getChatById({ chat, user }: FindByChatAndUser): Promise<Chat | null> {
+		if (!chat) throw new Error('ID was not informed!');
+
 		const chatMatch = await this.chatRepository.findByChatIdAndUserId({
 			chat,
 			user,
@@ -37,6 +43,8 @@ export class ChatService {
 	}
 
 	async getChatsByUserId(id: string): Promise<Chat[]> {
+		if (!id) throw new Error('ID was not informed!');
+
 		const chats = await this.chatRepository.findByUserId(id);
 
 		return chats;

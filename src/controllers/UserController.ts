@@ -9,9 +9,9 @@ export class UserController {
 	}
 
 	async createUser(request: Request, response: Response): Promise<Response> {
-		const { name, email, password } = request.body;
-
 		try {
+			const { name, email, password } = request.body;
+
 			const user = await this.userService.createUser({
 				name,
 				email,
@@ -41,12 +41,12 @@ export class UserController {
 	}
 
 	async updateUser(request: Request, response: Response): Promise<Response> {
-		const { id } = request.params;
-		const { name, email, password } = request.body;
-
 		try {
+			const { userId } = request as any;
+			const { name, email, password } = request.body;
+
 			const user = await this.userService.updateUser({
-				id,
+				id: userId,
 				name,
 				email,
 				password,

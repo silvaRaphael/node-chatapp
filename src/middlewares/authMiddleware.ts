@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
-import { UserService } from '../services/UserService';
 import { UserRepository } from '../repositories/UserRepository';
+import { AuthService } from '../services/AuthService';
+import { AuthRepository } from '../repositories/AuthRepository';
 
 export const authMiddleware = async (request: Request, response: Response, next: NextFunction) => {
 	try {
@@ -13,13 +14,14 @@ export const authMiddleware = async (request: Request, response: Response, next:
 		if (!token) throw new Error('Authorization token was not provided!');
 
 		const userRepository = new UserRepository();
-		const userService = new UserService(userRepository, null);
+		const authRepository = new AuthRepository(userRepository);
+		const authService = new AuthService(authRepository);
 
-		const authenticated = await userService.authenticateUser(token);
+		const userAuthenticated = await authService.verifyToken(token);
 
-		if (!authenticated) throw new Error('Unauthorized!');
+		if (!userAuthenticated) throw new Error('Unauthorized!');
 
-		const { id } = authenticated;
+		const { id } = userAuthenticated;
 
 		(request as any).userId = id;
 

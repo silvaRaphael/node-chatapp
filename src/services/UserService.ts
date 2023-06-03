@@ -1,7 +1,7 @@
 import { User } from '../entities/User';
 import { UserRepository } from '../repositories/UserRepository';
 import { Transporter } from 'nodemailer';
-import { newUserMailTemplate } from '../utils/mailTemplates';
+import { newUserEmailTemplate } from '../utils/emailTemplates';
 
 interface CreateUserRequest {
 	name: string;
@@ -25,12 +25,6 @@ export class UserService {
 		this.transporter = transporter;
 	}
 
-	async authenticateUser(token: string): Promise<User | null> {
-		const user = await this.userRepository.authenticate(token);
-
-		return user;
-	}
-
 	async createUser({ name, email, password }: CreateUserRequest): Promise<User> {
 		if (!name || !email || !password) throw new Error('Missing data!');
 
@@ -40,16 +34,20 @@ export class UserService {
 			password,
 		});
 
-		const createdUser = await this.userRepository.create(user);
+		try {
+			const createdUser = await this.userRepository.create(user);
 
-		this.transporter!.sendMail({
-			from: 'miles.barrows@ethereal.email',
-			to: user.email,
-			subject: 'User created! 🎉',
-			html: newUserMailTemplate(user),
-		});
+			this.transporter!.sendMail({
+				from: 'miles.barrows@ethereal.email',
+				to: user.email,
+				subject: 'User created! 🎉',
+				html: newUserEmailTemplate(user),
+			});
 
-		return createdUser;
+			return createdUser;
+		} catch (error: any) {
+			throw error;
+		}
 	}
 
 	async getUser(id: string): Promise<User | null> {

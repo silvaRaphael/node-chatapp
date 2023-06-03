@@ -1,5 +1,5 @@
 import { User } from '../entities/User';
-import { transporter } from '../providers/mailProvider';
+import { transporter } from '../providers/emailProvider';
 import { UserRepository } from '../repositories/UserRepository';
 import { UserService } from '../services/UserService';
 
