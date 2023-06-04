@@ -37,6 +37,7 @@ io.on('connection', (socket) => {
 
 			io.to(data.chat).emit('chat_message', {
 				name: user?.name,
+				user: data.user,
 				message: data.message,
 				createdAt: messageCreated.createdAt,
 			});
