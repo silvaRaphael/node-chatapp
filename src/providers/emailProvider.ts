@@ -1,10 +1,11 @@
 import { createTransport } from 'nodemailer';
+import 'dotenv/config';
 
 export const transporter = createTransport({
-	host: 'smtp.ethereal.email',
+	host: process.env.EMAIL_HOST,
 	port: 587,
 	auth: {
-		user: 'israel42@ethereal.email',
-		pass: '9xWWFNpxnm7ZpGf3Kr',
+		user: process.env.EMAIL_USER,
+		pass: process.env.EMAIL_PASS,
 	},
 });
