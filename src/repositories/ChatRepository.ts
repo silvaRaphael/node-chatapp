@@ -1,4 +1,5 @@
 import { Chat } from '../entities/Chat';
+import { ChatModel } from '../models/ChatModel';
 
 export interface FindByChatAndUser {
 	chat: string;
@@ -9,45 +10,76 @@ export interface IChatRepository {
 	create(chat: Chat): Promise<Chat>;
 	findByChatIdAndUserId({ chat, user }: FindByChatAndUser): Promise<Chat | null>;
 	findByUserId(id: string): Promise<Chat[]>;
-	save(chat: Chat): Promise<Chat>;
+	save(chat: Chat): Promise<void>;
 }
 
 export class ChatRepository implements IChatRepository {
-	chats: Chat[] = [];
-
 	async create(chat: Chat): Promise<Chat> {
-		const chatExists = this.chats.find(
-			(item) => item.users.includes(chat.users[0]) && item.users.includes(chat.users[1]),
-		);
+		const [userId, user] = chat.users;
+
+		const chatExists = await ChatModel.findOne({
+			users: { $all: [userId, user] },
+		})
+			.lean()
+			.exec();
 
 		if (chatExists) throw new Error('Chat already exists!');
 
-		this.chats.push(chat);
+		const chatCreated = await ChatModel.create({
+			_id: chat.id,
+			users: chat.users,
+			createdAt: chat.createdAt,
+			updatedAt: chat.updatedAt,
+		});
 
-		return chat;
+		return {
+			id: chatCreated._id.toString(),
+			...chatCreated.toObject(),
+		};
 	}
 
 	async findByChatIdAndUserId({ chat, user }: FindByChatAndUser): Promise<Chat | null> {
-		const chatMatch = this.chats.find((item) => item.id === chat && item.users.includes(user));
+		if(!isValidObjectId(chat)) return null;
+		
+		const chatExists = await ChatModel.findOne({ _id: chat, users: { $in: [user] } })
+			.populate('user', 'name')
+			.exec();
 
-		if (!chatMatch) return null;
+		if (!chatExists) return null;
 
-		return chatMatch;
+		return {
+			id: chatExists._id.toString(),
+			...chatExists.toObject(),
+		};
 	}
 
 	async findByUserId(id: string): Promise<Chat[]> {
-		const chats = this.chats.filter((item) => item.users.includes(id));
+		if(!isValidObjectId(id)) return [];
 
-		return chats;
+		const chats = await ChatModel.find({ users: { $in: [id] } })
+			.populate('user', 'name')
+			.lean()
+			.exec();
+
+		if (!chats) return [];
+
+		return chats.map((chat: any) => {
+			return {
+				id: chat._id.toString(),
+				...chat,
+			};
+		});
 	}
 
-	async save(chat: Chat): Promise<Chat> {
-		const chatMatch = this.chats.find((item) => item.id === chat.id);
+	async save(chat: Chat): Promise<void> {
+		const chatMatch = await ChatModel.findOne({ _id: chat }).exec();
 
 		if (!chatMatch) throw new Error('Chat does not exist!');
 
-		chatMatch.users = chat.users;
+		const [firstUser, secondUser] = chatMatch.users;
 
-		return chatMatch;
+		chatMatch.users = [firstUser, secondUser];
+
+		await chatMatch.save();
 	}
 }

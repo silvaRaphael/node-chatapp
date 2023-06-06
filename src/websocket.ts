@@ -1,5 +1,5 @@
-import { server } from './app';
 import { Server } from 'socket.io';
+import { server } from './app';
 import { corsOptions } from './utils/configs';
 import { MessageRepository } from './repositories/MessageRepository';
 import { MessageService } from './services/MessageService';

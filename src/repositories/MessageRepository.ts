@@ -1,4 +1,5 @@
 import { Message } from '../entities/Message';
+import { MessageModel } from '../models/MessageModels';
 
 export interface IMessageRepository {
 	create(message: Message): Promise<Message>;
@@ -6,17 +7,31 @@ export interface IMessageRepository {
 }
 
 export class MessageRepository implements IMessageRepository {
-	messages: Message[] = [];
-
 	async create(message: Message): Promise<Message> {
-		this.messages.push(message);
+		const messageCreated = await MessageModel.create({
+			chat: message.chat,
+			user: message.user,
+			content: message.content,
+			createdAt: message.createdAt,
+			updatedAt: message.updatedAt,
+		});
 
-		return message;
+		return {
+			id: messageCreated._id.toString(),
+			...messageCreated.toObject(),
+		};
 	}
 
 	async findByChatId(chat: string): Promise<Message[]> {
-		const messages = this.messages.filter((item) => item.chat === chat);
+		const messages = await MessageModel.find({ chat }).populate('user', 'name').lean().exec();
 
-		return messages;
+		if (!messages) return [];
+
+		return messages.map((message: any) => {
+			return {
+				id: message._id.toString(),
+				...message,
+			};
+		});
 	}
 }

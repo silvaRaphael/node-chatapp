@@ -38,7 +38,7 @@ export class MessageService {
 		return messageCreated;
 	}
 
-	async getMessagesByChatIdAndUserId({ chat, user }: FindByChatAndUser): Promise<Message[]> {
+	async getMessagesByChatId({ chat, user }: FindByChatAndUser): Promise<Message[]> {
 		if (!chat) throw new Error('ID was not informed!');
 
 		const chatExists = await this.chatRepository.findByChatIdAndUserId({

@@ -9,10 +9,11 @@ export class MessageController {
 	}
 
 	async createMessage(request: Request, response: Response): Promise<Response> {
-		try {
-			const { chat, user, content } = request.body;
+		const { userId } = request as any;
+		const { chat, content } = request.body;
 
-			const message = await this.messageService.createMessage({ chat, user, content });
+		try {
+			const message = await this.messageService.createMessage({ chat, user: userId, content });
 
 			return response.status(201).json(message);
 		} catch (error: any) {
@@ -23,12 +24,12 @@ export class MessageController {
 	}
 
 	async getMessagesByChatId(request: Request, response: Response): Promise<Response> {
-		try {
-			const { userId } = request as any;
-			const { id } = request.params;
+		const { userId } = request as any;
+		const { chatId } = request.params;
 
-			const messages = await this.messageService.getMessagesByChatIdAndUserId({
-				chat: id,
+		try {
+			const messages = await this.messageService.getMessagesByChatId({
+				chat: chatId,
 				user: userId,
 			});
 

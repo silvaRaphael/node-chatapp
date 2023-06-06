@@ -16,6 +16,9 @@ export class AuthService {
 	async verifyToken(token: string): Promise<User | null> {
 		const user = await this.authRepository.verifyToken(token);
 
+		(user as any).password = undefined;
+		(user as any).token = undefined;
+
 		return user;
 	}
 
@@ -27,6 +30,8 @@ export class AuthService {
 				email,
 				password,
 			});
+
+			(userAuthenticated as any).password = undefined;
 
 			return userAuthenticated;
 		} catch (error: any) {

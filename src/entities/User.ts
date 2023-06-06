@@ -1,4 +1,4 @@
-import { uuid } from 'uuidv4';
+import { randomBytes } from 'node:crypto';
 
 export interface IUser {
 	id?: string;
@@ -6,8 +6,8 @@ export interface IUser {
 	email: string;
 	password: string;
 	token?: string;
-	createdAt?: string;
-	updatedAt?: string;
+	createdAt?: Date;
+	updatedAt?: Date;
 }
 
 export class User {
@@ -20,11 +20,11 @@ export class User {
 	public updatedAt: Date;
 
 	constructor({ id, name, email, password }: IUser) {
-		this.id = id || 'meu-id' /* uuid() */;
+		this.id = id || randomBytes(12).toString('hex');
 		this.name = name;
 		this.email = email;
 		this.password = password;
-		this.token = 'meu-token' /* uuid() */;
+		this.token = randomBytes(12).toString('hex');
 		this.createdAt = new Date();
 		this.updatedAt = new Date();
 	}

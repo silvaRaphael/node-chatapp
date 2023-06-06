@@ -1,4 +1,4 @@
-import { uuid } from 'uuidv4';
+import { randomBytes } from 'node:crypto';
 
 export interface IChat {
 	id?: string;
@@ -14,7 +14,7 @@ export class Chat implements IChat {
 	public updatedAt: Date;
 
 	constructor({ id, users }: IChat) {
-		this.id = id || 'meu-id' /* uuid() */;
+		this.id = id || randomBytes(12).toString('hex');
 		this.users = users;
 		this.createdAt = new Date();
 		this.updatedAt = new Date();

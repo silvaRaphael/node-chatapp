@@ -1,9 +1,9 @@
-import { uuid } from 'uuidv4';
+import { randomBytes } from 'node:crypto';
 
 export interface IMessage {
 	id?: string;
-	user: string;
 	chat: string;
+	user: string;
 	content: string;
 	createdAt?: Date;
 	updatedAt?: Date;
@@ -11,16 +11,16 @@ export interface IMessage {
 
 export class Message implements IMessage {
 	public id: string;
-	public user: string;
 	public chat: string;
+	public user: string;
 	public content: string;
 	public createdAt: Date;
 	public updatedAt: Date;
 
-	constructor({ id, user, chat, content }: IMessage) {
-		this.id = id || 'meu-id' /* uuid() */;
-		this.user = user;
+	constructor({ id, chat, user, content }: IMessage) {
+		this.id = id || randomBytes(12).toString('hex');
 		this.chat = chat;
+		this.user = user;
 		this.content = content;
 		this.createdAt = new Date();
 		this.updatedAt = new Date();

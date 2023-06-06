@@ -11,11 +11,10 @@ export class ChatController {
 	async createChat(request: Request, response: Response): Promise<Response> {
 		try {
 			const { userId } = request as any;
-			const { users } = request.body;
+			const { user } = request.body;
 
 			const chat = await this.chatService.createChat({
-				userId,
-				users,
+				users: [userId, user],
 			});
 
 			return response.status(201).json(chat);

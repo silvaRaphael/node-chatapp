@@ -12,9 +12,11 @@ const chatRepository = new ChatRepository();
 const messageService = new MessageService(messageRepository, chatRepository);
 const messageController = new MessageController(messageService);
 
-messageRoutes.use(authMiddleware);
-
-messageRoutes.post('/messages', (req, res) => messageController.createMessage(req, res));
-messageRoutes.get('/messages/:id', (req, res) => messageController.getMessagesByChatId(req, res));
+messageRoutes.post('/messages', authMiddleware, (req, res) =>
+	messageController.createMessage(req, res),
+);
+messageRoutes.get('/messages/:chatId', authMiddleware, (req, res) =>
+	messageController.getMessagesByChatId(req, res),
+);
 
 export { messageRoutes };

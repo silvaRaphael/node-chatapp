@@ -1,6 +1,9 @@
+import { randomBytes } from 'node:crypto';
 import { User } from '../entities/User';
 import { SignInRequest } from '../services/AuthService';
 import { UserRepository } from './UserRepository';
+import bcrypt from 'bcryptjs';
+import { UserModel } from '../models/UserModel';
 
 export interface IAuthRepository {
 	verifyToken(token: string): Promise<User | null>;
@@ -10,44 +13,45 @@ export interface IAuthRepository {
 
 export class AuthRepository implements IAuthRepository {
 	private userRepository: UserRepository;
-	private users: User[];
 
 	constructor(userRepository: UserRepository) {
 		this.userRepository = userRepository;
-		this.users = userRepository.users;
 	}
 
 	async verifyToken(token: string): Promise<User | null> {
-		const user = this.users.find((item) => item.token === token);
+		const user = await UserModel.findOne({ token }).exec();
 
 		if (!user) return null;
 
-		return user;
+		return {
+			id: user._id.toString(),
+			...user.toObject(),
+		};
 	}
 
 	async signIn({ email, password }: SignInRequest): Promise<User> {
-		const emailExists = this.users.find((item) => item.email === email);
+		const user = await UserModel.findOne({ email }).exec();
 
-		if (!emailExists) throw new Error('User does not exist!');
+		if (!user) throw new Error('User does not exist!');
 
-		const user = this.users.find((item) => item.email === email && item.password === password);
+		const passwordMatches = await bcrypt.compare(password, user.password);
 
-		if (!user) throw new Error('Wrong password!');
+		if (!passwordMatches) throw new Error('Wrong password!');
 
-		user.token = 'meu-token';
+		user.token = randomBytes(12).toString('hex');
 
-		this.userRepository.save(user);
+		this.userRepository.save(user.toObject());
 
-		return user;
+		return user.toObject();
 	}
 
 	async signOut(id: string): Promise<void> {
-		const user = this.users.find((item) => item.id === id);
+		const user = await UserModel.findById(id).exec();
 
 		if (user) {
 			user.token = '';
 
-			this.userRepository.save(user);
+			this.userRepository.save(user.toObject());
 		}
 	}
 }

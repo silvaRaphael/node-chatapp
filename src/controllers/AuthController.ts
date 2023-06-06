@@ -22,7 +22,7 @@ export class AuthController {
 
 			if (!userAuthenticated) throw new Error('Unauthorized!');
 
-			return response.status(200).json({ userAuthenticated });
+			return response.status(200).json(userAuthenticated);
 		} catch (error: any) {
 			return response.status(401).json({
 				message: error.message,
@@ -39,7 +39,9 @@ export class AuthController {
 				password,
 			});
 
-			return response.status(200).json({ user });
+			(user as any).password = undefined;
+
+			return response.status(200).json(user);
 		} catch (error: any) {
 			return response.status(401).json({
 				message: error.message,

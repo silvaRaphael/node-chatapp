@@ -3,6 +3,10 @@ import { UserRepository } from '../repositories/UserRepository';
 import { AuthService } from '../services/AuthService';
 import { AuthRepository } from '../repositories/AuthRepository';
 
+const userRepository = new UserRepository();
+const authRepository = new AuthRepository(userRepository);
+const authService = new AuthService(authRepository);
+
 export const authMiddleware = async (request: Request, response: Response, next: NextFunction) => {
 	try {
 		const { authorization } = request.headers;
@@ -12,10 +16,6 @@ export const authMiddleware = async (request: Request, response: Response, next:
 		const [_, token] = authorization.split(' ');
 
 		if (!token) throw new Error('Authorization token was not provided!');
-
-		const userRepository = new UserRepository();
-		const authRepository = new AuthRepository(userRepository);
-		const authService = new AuthService(authRepository);
 
 		const userAuthenticated = await authService.verifyToken(token);
 

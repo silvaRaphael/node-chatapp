@@ -10,9 +10,8 @@ const chatRepository = new ChatRepository();
 const chatService = new ChatService(chatRepository);
 const chatController = new ChatController(chatService);
 
-chatRoutes.use(authMiddleware);
-
-chatRoutes.post('/chats', (req, res) => chatController.createChat(req, res));
-chatRoutes.get('/chats', (req, res) => chatController.getChatsByUserId(req, res));
+chatRoutes.post('/chats', authMiddleware, (req, res) => chatController.createChat(req, res));
+chatRoutes.get('/chats', authMiddleware, (req, res) => chatController.getChatsByUserId(req, res));
+chatRoutes.get('/chats/:id', authMiddleware, (req, res) => chatController.getChatById(req, res));
 
 export { chatRoutes };

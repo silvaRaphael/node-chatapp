@@ -1,34 +1,50 @@
+import { isValidObjectId } from 'mongoose';
 import { User } from '../entities/User';
+import { UserModel } from '../models/UserModel';
 
-export interface UserRepository {
+export interface IUserRepository {
 	create(user: User): Promise<User>;
 	findById(id: string): Promise<User | null>;
-	save(user: User): Promise<User>;
+	save(user: User): Promise<void>;
 }
 
-export class UserRepository implements UserRepository {
-	users: User[] = [];
-
+export class UserRepository implements IUserRepository {
 	async create(user: User): Promise<User> {
-		const userExists = this.users.find((item) => item.email === user.email);
+		const userExists = await UserModel.findOne({ email: user.email }).exec();
 
 		if (userExists) throw new Error('Email already in use!');
 
-		this.users.push(user);
+		const userCreated = await UserModel.create({
+			_id: user.id,
+			name: user.name,
+			email: user.email,
+			token: user.token,
+			password: user.password,
+			createdAt: user.createdAt,
+			updatedAt: user.updatedAt,
+		});
 
-		return user;
+		return {
+			id: userCreated._id.toString(),
+			...userCreated.toObject(),
+		};
 	}
 
 	async findById(id: string): Promise<User | null> {
-		const user = this.users.find((item) => item.id === id);
+		if (!isValidObjectId(id)) return null;
+
+		const user = await UserModel.findById(id).exec();
 
 		if (!user) return null;
 
-		return user;
+		return {
+			id: user._id.toString(),
+			...user.toObject(),
+		};
 	}
 
-	async save(user: User): Promise<User> {
-		const userMatch = this.users.find((item) => item.id === user.id);
+	async save(user: User): Promise<void> {
+		const userMatch = await UserModel.findById(user.id).exec();
 
 		if (!userMatch) throw new Error('User does not exist!');
 
@@ -37,6 +53,6 @@ export class UserRepository implements UserRepository {
 		userMatch.password = user.password;
 		userMatch.updatedAt = new Date();
 
-		return userMatch;
+		await userMatch.save();
 	}
 }
