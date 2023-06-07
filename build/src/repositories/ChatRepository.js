@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChatRepository = void 0;
+const mongoose_1 = require("mongoose");
 const ChatModel_1 = require("../models/ChatModel");
 class ChatRepository {
     async create(chat) {
@@ -21,7 +22,7 @@ class ChatRepository {
         return Object.assign({ id: chatCreated._id.toString() }, chatCreated.toObject());
     }
     async findByChatIdAndUserId({ chat, user }) {
-        if (!isValidObjectId(chat))
+        if (!(0, mongoose_1.isValidObjectId)(chat))
             return null;
         const chatExists = await ChatModel_1.ChatModel.findOne({ _id: chat, users: { $in: [user] } })
             .populate('user', 'name')
@@ -31,7 +32,7 @@ class ChatRepository {
         return Object.assign({ id: chatExists._id.toString() }, chatExists.toObject());
     }
     async findByUserId(id) {
-        if (!isValidObjectId(id))
+        if (!(0, mongoose_1.isValidObjectId)(id))
             return [];
         const chats = await ChatModel_1.ChatModel.find({ users: { $in: [id] } })
             .populate('user', 'name')
