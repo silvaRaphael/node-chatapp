@@ -3,12 +3,19 @@ import { User } from '../entities/User';
 import { UserModel } from '../models/UserModel';
 
 export interface IUserRepository {
+	verifyToken(token: string): Promise<boolean>;
 	create(user: User): Promise<User>;
 	findById(id: string): Promise<User | null>;
 	save(user: User): Promise<void>;
 }
 
 export class UserRepository implements IUserRepository {
+	async verifyToken(token: string): Promise<boolean> {
+		const user = await UserModel.findOne({ token }).lean().exec();
+
+		return !!user;
+	}
+
 	async create(user: User): Promise<User> {
 		const userExists = await UserModel.findOne({ email: user.email }).exec();
 
