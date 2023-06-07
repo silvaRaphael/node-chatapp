@@ -31,6 +31,10 @@ export class MessageRepository implements IMessageRepository {
 			return {
 				id: message._id.toString(),
 				...message,
+				user: {
+					id: message.user._id,
+					name: message.user.name,
+				},
 			};
 		});
 	}

@@ -16,6 +16,8 @@ export class AuthService {
 	async verifyToken(token: string): Promise<User | null> {
 		const user = await this.authRepository.verifyToken(token);
 
+		if (!user) return null;
+
 		(user as any).password = undefined;
 		(user as any).token = undefined;
 

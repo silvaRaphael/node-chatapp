@@ -43,7 +43,7 @@ export class ChatRepository implements IChatRepository {
 		if (!isValidObjectId(chat)) return null;
 
 		const chatExists = await ChatModel.findOne({ _id: chat, users: { $in: [user] } })
-			.populate('user', 'name')
+			.populate('users', 'name')
 			.exec();
 
 		if (!chatExists) return null;
@@ -58,7 +58,7 @@ export class ChatRepository implements IChatRepository {
 		if (!isValidObjectId(id)) return [];
 
 		const chats = await ChatModel.find({ users: { $in: [id] } })
-			.populate('user', 'name')
+			.populate('users', 'name')
 			.lean()
 			.exec();
 

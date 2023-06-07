@@ -26,12 +26,6 @@ export class UserService {
 		this.transporter = transporter;
 	}
 
-	async verifyToken(token: string): Promise<boolean> {
-		const validToken = await this.userRepository.verifyToken(token);
-
-		return validToken;
-	}
-
 	async createUser({ name, email, password }: CreateUserRequest): Promise<User> {
 		if (!name || !email || !password) throw new Error('Missing data!');
 

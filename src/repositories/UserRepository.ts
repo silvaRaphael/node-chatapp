@@ -3,19 +3,12 @@ import { User } from '../entities/User';
 import { UserModel } from '../models/UserModel';
 
 export interface IUserRepository {
-	verifyToken(token: string): Promise<boolean>;
 	create(user: User): Promise<User>;
 	findById(id: string): Promise<User | null>;
 	save(user: User): Promise<void>;
 }
 
 export class UserRepository implements IUserRepository {
-	async verifyToken(token: string): Promise<boolean> {
-		const user = await UserModel.findOne({ token }).lean().exec();
-
-		return !!user;
-	}
-
 	async create(user: User): Promise<User> {
 		const userExists = await UserModel.findOne({ email: user.email }).exec();
 
@@ -51,13 +44,14 @@ export class UserRepository implements IUserRepository {
 	}
 
 	async save(user: User): Promise<void> {
-		const userMatch = await UserModel.findById(user.id).exec();
+		const userMatch = await UserModel.findById((user as any)._id).exec();
 
 		if (!userMatch) throw new Error('User does not exist!');
 
 		userMatch.name = user.name;
 		userMatch.email = user.email;
 		userMatch.password = user.password;
+		userMatch.token = user.token;
 		userMatch.updatedAt = new Date();
 
 		await userMatch.save();

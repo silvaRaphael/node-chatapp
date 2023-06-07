@@ -4,8 +4,9 @@ import { corsOptions } from './utils/configs';
 import { MessageRepository } from './repositories/MessageRepository';
 import { MessageService } from './services/MessageService';
 import { ChatRepository } from './repositories/ChatRepository';
-import { UserService } from './services/UserService';
 import { UserRepository } from './repositories/UserRepository';
+import { AuthRepository } from './repositories/AuthRepository';
+import { AuthService } from './services/AuthService';
 
 const io = new Server(server, {
 	cors: corsOptions,
@@ -24,19 +25,18 @@ io.on('connection', (socket) => {
 			const chatRepository = new ChatRepository();
 			const messageService = new MessageService(messageRepository, chatRepository);
 			const userRepository = new UserRepository();
-			const userService = new UserService(userRepository, null);
+			const authRepository = new AuthRepository(userRepository);
+			const authService = new AuthService(authRepository);
 
-			const tokenValid = await userService.verifyToken(data.token);
+			const user = await authService.verifyToken(data.token);
 
-			if (!tokenValid) throw new Error('Invalid token!');
+			if (!user) throw new Error('Invalid token!');
 
 			const messageCreated = await messageService.createMessage({
 				chat: data.chat,
 				user: data.user,
 				content: data.content,
 			});
-
-			const user = await userService.getUser(data.user);
 
 			io.to(data.chat).emit('chat_message', {
 				name: user?.name,

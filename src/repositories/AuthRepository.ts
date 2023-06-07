@@ -42,7 +42,10 @@ export class AuthRepository implements IAuthRepository {
 
 		this.userRepository.save(user.toObject());
 
-		return user.toObject();
+		return {
+			id: user._id.toString(),
+			...user.toObject(),
+		};
 	}
 
 	async signOut(id: string): Promise<void> {

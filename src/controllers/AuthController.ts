@@ -39,8 +39,6 @@ export class AuthController {
 				password,
 			});
 
-			(user as any).password = undefined;
-
 			return response.status(200).json(user);
 		} catch (error: any) {
 			return response.status(401).json({
