@@ -22,18 +22,21 @@ io.on('connection', (socket) => {
             const messageRepository = new MessageRepository_1.MessageRepository();
             const chatRepository = new ChatRepository_1.ChatRepository();
             const messageService = new MessageService_1.MessageService(messageRepository, chatRepository);
+            const userRepository = new UserRepository_1.UserRepository();
+            const userService = new UserService_1.UserService(userRepository, null);
+            const tokenValid = await userService.verifyToken(data.token);
+            if (!tokenValid)
+                throw new Error('Invalid token!');
             const messageCreated = await messageService.createMessage({
                 chat: data.chat,
                 user: data.user,
-                content: data.message,
+                content: data.content,
             });
-            const userRepository = new UserRepository_1.UserRepository();
-            const userService = new UserService_1.UserService(userRepository, null);
             const user = await userService.getUser(data.user);
             io.to(data.chat).emit('chat_message', {
                 name: user === null || user === void 0 ? void 0 : user.name,
                 user: data.user,
-                message: data.message,
+                content: data.content,
                 createdAt: messageCreated.createdAt,
             });
         }

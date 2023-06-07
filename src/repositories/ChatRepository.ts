@@ -1,3 +1,4 @@
+import { isValidObjectId } from 'mongoose';
 import { Chat } from '../entities/Chat';
 import { ChatModel } from '../models/ChatModel';
 
@@ -39,8 +40,8 @@ export class ChatRepository implements IChatRepository {
 	}
 
 	async findByChatIdAndUserId({ chat, user }: FindByChatAndUser): Promise<Chat | null> {
-		if(!isValidObjectId(chat)) return null;
-		
+		if (!isValidObjectId(chat)) return null;
+
 		const chatExists = await ChatModel.findOne({ _id: chat, users: { $in: [user] } })
 			.populate('user', 'name')
 			.exec();
@@ -54,7 +55,7 @@ export class ChatRepository implements IChatRepository {
 	}
 
 	async findByUserId(id: string): Promise<Chat[]> {
-		if(!isValidObjectId(id)) return [];
+		if (!isValidObjectId(id)) return [];
 
 		const chats = await ChatModel.find({ users: { $in: [id] } })
 			.populate('user', 'name')

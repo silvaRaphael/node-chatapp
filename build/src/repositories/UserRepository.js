@@ -4,6 +4,10 @@ exports.UserRepository = void 0;
 const mongoose_1 = require("mongoose");
 const UserModel_1 = require("../models/UserModel");
 class UserRepository {
+    async verifyToken(token) {
+        const user = await UserModel_1.UserModel.findOne({ token }).lean().exec();
+        return !!user;
+    }
     async create(user) {
         const userExists = await UserModel_1.UserModel.findOne({ email: user.email }).exec();
         if (userExists)

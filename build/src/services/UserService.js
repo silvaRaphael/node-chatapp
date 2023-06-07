@@ -12,6 +12,10 @@ class UserService {
         this.userRepository = userRepository;
         this.transporter = transporter;
     }
+    async verifyToken(token) {
+        const validToken = await this.userRepository.verifyToken(token);
+        return validToken;
+    }
     async createUser({ name, email, password }) {
         if (!name || !email || !password)
             throw new Error('Missing data!');
